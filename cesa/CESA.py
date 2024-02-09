@@ -50,14 +50,15 @@ def calc_pval(xi,xj):
 
 def make_correction_mat(data,total_read):
     """
-    _summary_
+    Quantify the dependence of each pair when correcting for relative amounts and create a matrix. 
+    The return matrix represents the magnitude of the effect on the species in column j to row i.
 
     Args:
-        df (array_like): _description_
-        total_read (int): シークエンスのリード数
+        data (array_like): Time series matrix with species in rows and time in columns
+        total_read (int): Total read count
 
     Returns:
-        _type_: _description_
+        correct_mat (np.ndarray): Number of changes in the increase or decrease of species in row i when the variation of species in column j is hypothetically eliminated
     """
 
     X=np.array(data)
@@ -79,13 +80,19 @@ def make_correction_mat(data,total_read):
 
 
 def CE(data):
-    """_summary_
+    """
+    Return p-values for coexistence and exclusion tests, and an index of bias (ad-bc) for the contingency table.
+    In the binary time series of OTU-i and OTU-j, there are 4 cases (1,1), (1,0), (0,1) or (0,0) at each observation time step.
+    a, b, c, d represent the percentages of (1,1), (1,0), (0,1) and (0,0), respectively.
 
     Args:
-        df (_type_): _description_
+        data (array_like): Time series matrix with species in rows and time in columns
 
     Returns:
-        _type_: _description_
+        (np.adarray, np.adarray, np.adarray)
+        C_pval_mat (np.adarray): Upper triangular matrix of p-values for the coexisting test
+        E_pval_mat (np.adarray): Upper triangular matrix of p-values for the exclusion test
+        ADBC_mat (np.adarray): Upper triangular matrix of ad-bc
     """
 
     X=np.array(data)
@@ -111,22 +118,25 @@ def CE(data):
     return C_pval_mat,E_pval_mat,ADBC_mat
 
 
-def SA(df,correct_mat,total_read):
+def SA(data,correct_mat,total_read):
     """
-    _summary_
+    Return the p-values for synchronization and anti-synchronization tests, and the cross moments(CM) for each pair
 
     Args:
-        df (_type_): _description_
-        correct_mat (_type_): _description_
-        total_read (_type_): _description_
+        data (array_like): Time series matrix with species in rows and time in columns
+        correct_mat (array_like): Number of changes in the increase or decrease of species in row i when the variation of species in column j is hypothetically eliminated
+        total_read (int): Total read count
 
     Returns:
-        _type_: _description_
+        (np.adarray, np.adarray, np.adarray)
+        S_pval_mat (np.adarray): Upper triangular matrix of p-values for the synchronization test
+        AS_pval_mat (np.adarray): Upper triangular matrix of p-values for the anti-synchronization test
+        CM_mat (np.adarray): Upper triangular matrix of CM
     """
 
     correct_mat=np.array(correct_mat)
-    N=df.shape[0]
-    X=np.array(df)
+    X=np.array(data)
+    N=X.shape[0]
 
     S_pval_mat=np.zeros((N,N))
     AS_pval_mat=np.zeros((N,N))
@@ -189,13 +199,13 @@ def SA(df,correct_mat,total_read):
 
 def combining_pval(pval_list):
     """
-    _summary_
+    Returns the matrix of combined p-values for the S samples
 
     Args:
-        pval_list (_type_): _description_
+        pval_list (list): List of p-value matrices
 
     Returns:
-        _type_: _description_
+        com_pval (np.ndarray): the matrix of combined p-values for the S samples
     """
     S=len(pval_list)
     Y=-2*np.log(pval_list).sum(axis=0)
