@@ -2,4 +2,4 @@
 
 step1 : Run 
 
-# USAGE
+# Example
