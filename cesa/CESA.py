@@ -24,8 +24,8 @@ def COEX(data):
     T=X.shape[1]
     Y=np.where(X!=0,1,0)
 
-    C_pval_mat=np.zeros((N,N))
-    E_pval_mat=np.zeros((N,N))
+    CO_pval_mat=np.zeros((N,N))
+    EX_pval_mat=np.zeros((N,N))
     ADBC_mat=np.zeros((N,N))
     for i in range(N):
         yi=Y[i,:]
@@ -35,16 +35,16 @@ def COEX(data):
             b=np.sum((yi==1) & (yj==0))
             c=np.sum((yi==0) & (yj==1))
             d=np.sum((yi==0) & (yj==0))
-            C_pval_mat[i,j]=fisher_exact([[a,b],[c,d]],'greater')[1]
-            E_pval_mat[i,j]=fisher_exact([[a,b],[c,d]],'less')[1]
+            CO_pval_mat[i,j]=fisher_exact([[a,b],[c,d]],'greater')[1]
+            EX_pval_mat[i,j]=fisher_exact([[a,b],[c,d]],'less')[1]
             ADBC_mat[i,j]=(a*d-b*c)/T**2
 
-    return C_pval_mat,E_pval_mat,ADBC_mat
+    return CO_pval_mat,EX_pval_mat,ADBC_mat
 
 
 def SYAS(data,total_read,correction=True):
     """
-    Return the p-values for synchronization and anti-synchronization tests, and the cross moments(CM) for each pair
+    Return the p-values for synchronization and anti-synchronization tests, and the normarized inner product (NI) for each pair
 
     Args:
         data (array_like): Time series matrix with species in rows and time in columns
@@ -55,7 +55,7 @@ def SYAS(data,total_read,correction=True):
         (np.adarray, np.adarray, np.adarray)
         S_pval_mat (np.adarray): Upper triangular matrix of p-values for the synchronization test
         AS_pval_mat (np.adarray): Upper triangular matrix of p-values for the anti-synchronization test
-        CM_mat (np.adarray): Upper triangular matrix of CM
+        NI_mat (np.adarray): Upper triangular matrix of the normarized inner product
     """
 
     X=np.array(data)
@@ -67,7 +67,7 @@ def SYAS(data,total_read,correction=True):
 
         SY_pval_mat=np.zeros((N,N))
         AS_pval_mat=np.zeros((N,N))
-        CM_mat=np.zeros((N,N))
+        NI_mat=np.zeros((N,N))
         for i in range(N):
             for j in range(i+1,N):
                 #correction
@@ -90,9 +90,9 @@ def SYAS(data,total_read,correction=True):
                 yi=cmd.ternary_transform(xi)[ind]
                 yj=cmd.ternary_transform(xj)[ind]
                 if L==0:
-                    CM_mat[i,j]=0
+                    NI_mat[i,j]=0
                 else:
-                    CM_mat[i,j]=np.dot(yi,yj)/L
+                    NI_mat[i,j]=np.dot(yi,yj)/L
                 
                 #no correction
                 SY_pval,AS_pval=cmd.calc_pval(xi,xj)
@@ -129,7 +129,7 @@ def SYAS(data,total_read,correction=True):
     else:
         SY_pval_mat=np.zeros((N,N))
         AS_pval_mat=np.zeros((N,N))
-        CM_mat=np.zeros((N,N))
+        NI_mat=np.zeros((N,N))
         for i in range(N):
             for j in range(i+1,N):
                 xi=X[i,:]
@@ -142,16 +142,16 @@ def SYAS(data,total_read,correction=True):
                 yi=cmd.ternary_transform(xi)[ind]
                 yj=cmd.ternary_transform(xj)[ind]
                 if L==0:
-                    CM_mat[i,j]=0
+                    NI_mat[i,j]=0
                 else:
-                    CM_mat[i,j]=np.dot(yi,yj)/L
+                    NI_mat[i,j]=np.dot(yi,yj)/L
                 
                 SY_pval,AS_pval=cmd.calc_pval(xi,xj)
 
                 SY_pval_mat[i,j]=SY_pval
                 AS_pval_mat[i,j]=AS_pval
 
-    return SY_pval_mat,AS_pval_mat,CM_mat
+    return SY_pval_mat,AS_pval_mat,NI_mat
 
 
 def combining_pval(pval_list):
@@ -164,6 +164,7 @@ def combining_pval(pval_list):
     Returns:
         com_pval (np.ndarray): the matrix of combined p-values for the S samples
     """
+
     S=len(pval_list)
     Y=-2*np.log(pval_list).sum(axis=0)
     com_pval=chi2.sf(Y,2*S)
