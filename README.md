@@ -14,9 +14,10 @@ import numpy as np
 import pandas as pd
 
 #When calculating p-values for a single sample
-data=pd.DataFrame('example/data_sample1.csv',header=0,index_col=0)
+data=pd.DataFrame('example/data_sample1.csv',header=0,index_col=0)  #Time series matrix with species in rows and time in columns
 CO,EX,ADBC=COEX(data)
-SY,AS,NI=SYAS(data,total_read=3000,correction=True)
+SY,AS,NI=SYAS(data,total_read=3000,correction=True)  #if there is no regulation for the total sum of values, set total_read=0, correction=False.
+
 
 #When calculating combined p-values for multiple samples
 CO_list=[]
