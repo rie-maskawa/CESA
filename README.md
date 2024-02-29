@@ -1,13 +1,13 @@
 # CESA
 CESA (Coexistence-Exclusion-Synchronization-Anti-synchronization) is a Python module designed to detect significant relationships among time series sets described by integer vectors. Detailed information regarding the algorithm can be found in the associated publication.
 
-# Requirements
-
+# Requirement
+poetry
 
 # Installation
 
 ```
-poetry add 
+poetry add git+https://github.com/rie-maskawa/CESA.git#main
 ```
 
 # Usage
