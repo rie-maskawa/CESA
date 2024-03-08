@@ -21,6 +21,7 @@ You can try this package using sample data provided in the example directory.
 from cesa import COEX,SYAS,combining_pval
 import pandas as pd
 ```
+<img width="299" alt="image" src="https://github.com/rie-maskawa/CESA/assets/84298724/eb6320ec-5271-47ee-91aa-49cdbd633bc1">
 
 - Load your data file. The data should be structured as a time series matrix with species in rows and time in columns.
  ```
