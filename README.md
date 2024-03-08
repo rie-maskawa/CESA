@@ -35,6 +35,8 @@ CO,EX,V=COEX(data)
 
 The function returns matrices for coexitence (CO), exclusion (EX), and bias in appearance time (V). These matrices are in the form of upper triangular matrices. To access the p-value for co-occurrence between OTU2 and OTU7, for example, you would reference CO[1,6] (note that the indices may be shifted).
 
+<img width="425" alt="image" src="https://github.com/rie-maskawa/CESA/assets/84298724/106e49ef-bb7d-4c4f-95e6-a85f18860b58">
+
  - Use the SYAS function to compute the p-values for synchronization and antisynchronization, as well as the normalized inner product of the ternarized time series.
 ```
 SY,AS,NI=SYAS(data,total_read=3000,correction=True)
