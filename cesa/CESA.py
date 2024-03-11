@@ -166,6 +166,7 @@ def combining_pval(pval_list):
     """
 
     S=len(pval_list)
-    Y=-2*np.log(pval_list).sum(axis=0)
+    pval_list=np.array(pval_list)
+    Y=-2*np.log(np.where(pval_list==0,1,pval_list)).sum(axis=0)
     com_pval=chi2.sf(Y,2*S)
-    return com_pval
+    return np.where(com_pval==1,0,com_pval)
